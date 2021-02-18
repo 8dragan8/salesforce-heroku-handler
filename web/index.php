@@ -1,25 +1,44 @@
 <?php
 
-require('../vendor/autoload.php');
+$url = 'https://app1.renderator.com/php/api/update_suites_data.php';
 
-$app = new Silex\Application();
-$app['debug'] = true;
+$xml = file_get_contents('php://input');
 
-// Register the monolog logging service
-$app->register(new Silex\Provider\MonologServiceProvider(), array(
-  'monolog.logfile' => 'php://stderr',
-));
+$response = false;
+if ($xml) {
 
-// Register view rendering
-$app->register(new Silex\Provider\TwigServiceProvider(), array(
-    'twig.path' => __DIR__.'/views',
-));
+    //Initiate cURL
+    $curl = curl_init($url);
 
-// Our web handlers
+    //Set the Content-Type to text/xml.
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: text/xml"));
 
-$app->get('/', function() use($app) {
-  $app['monolog']->addDebug('logging output.');
-  return $app['twig']->render('index.twig');
-});
+    //Set CURLOPT_POST to true to send a POST request.
+    curl_setopt($curl, CURLOPT_POST, true);
 
-$app->run();
+    //Attach the XML string to the body of our request.
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $xml);
+
+    //Tell cURL that we want the response to be returned as
+    //a string instead of being dumped to the output.
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+    //Execute the POST request and send our XML.
+    $result = curl_exec($curl);
+
+    //Do some basic error checking.
+    if (curl_errno($curl)) {
+        throw new Exception(curl_error($curl));
+    }
+
+    //Close the cURL handle.
+    curl_close($curl);
+
+    //Print out the response output.
+    $response = array(
+        "xml" => $xml,
+        "result" => $result,
+    );
+}
+
+echo $response;
