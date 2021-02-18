@@ -1,7 +1,7 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
 
-$url = 'https://app1.renderator.com/php/api/update_suites_data.php';
+$url = 'https://app1.renderator.com/php/api/inboundHanlder.php?token=1609941097';
 
 $xml = file_get_contents('php://input');
 
