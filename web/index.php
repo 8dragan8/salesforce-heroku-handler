@@ -29,7 +29,13 @@ if ($xml) {
 
     //Do some basic error checking.
     if (curl_errno($curl)) {
-        throw new Exception(curl_error($curl));
+        $err = new Exception(curl_error($curl));
+        $response = [
+            "xml" => $xml,
+            "result" => $result,
+            "err" => $err
+        ];
+        throw $err;
     }
 
     //Close the cURL handle.
