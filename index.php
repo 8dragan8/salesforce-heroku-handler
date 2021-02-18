@@ -5,32 +5,36 @@ require_once('libs/SalesforceInboundHandler.php');
 require_once('/create_user_fs.php');
 
 
+$xml = file_get_contents('php://input');
 
-$userFileSystem = new UserFileSystem();
+$url = 'https://app1.renderator.com/php/api/update_suites_data.php';
 
-$headers =  getallheaders();
-$userFileSystem->writeErrorLog($headers);
-// $userFileSystem->writeErrorLog(file_get_contents('php://input'));
+//Initiate cURL
+$curl = curl_init($url);
 
-$handler = new SalesforceInboundHandler(false); // default = false , true means will use sample instead posted data.
-$handler->SalesforceToMysqlSyncWithApi();
+//Set the Content-Type to text/xml.
+curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: text/xml"));
 
+//Set CURLOPT_POST to true to send a POST request.
+curl_setopt($curl, CURLOPT_POST, true);
 
-$fields = array("unit__c", "status");
+//Attach the XML string to the body of our request.
+curl_setopt($curl, CURLOPT_POSTFIELDS, $xml);
 
-if ($handler->isError == false && $handler->records) {
+//Tell cURL that we want the response to be returned as
+//a string instead of being dumped to the output.
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-    $json  = $handler->getJsonWithFields($fields);
-    //some process here.
+//Execute the POST request and send our XML.
+$result = curl_exec($curl);
 
-    if ($json) {
-        $dataUpdateProcess = $userFileSystem->updateSuitesData($json, '1609941097');
-        error_log($dataUpdateProcess);
-    } else {
-        error_log($json);
-    }
-    $handler->respondSuccess();
-} else {
-
-    $handler->respondBad($handler->errorMsg);
+//Do some basic error checking.
+if (curl_errno($curl)) {
+    throw new Exception(curl_error($curl));
 }
+
+//Close the cURL handle.
+curl_close($curl);
+
+//Print out the response output.
+echo $result;
