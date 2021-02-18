@@ -1,4 +1,5 @@
 <?php
+header("Content-Type: application/json; charset=UTF-8");
 
 $url = 'https://app1.renderator.com/php/api/update_suites_data.php';
 
@@ -35,10 +36,10 @@ if ($xml) {
     curl_close($curl);
 
     //Print out the response output.
-    $response = array(
+    $response = [
         "xml" => $xml,
         "result" => $result,
-    );
+    ];
 }
 
 echo $response;
