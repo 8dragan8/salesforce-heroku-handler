@@ -37,4 +37,9 @@ if (curl_errno($curl)) {
 curl_close($curl);
 
 //Print out the response output.
-echo $result;
+$response = array(
+    "xml" => $xml,
+    "result" => $result,
+);
+
+echo $response;
