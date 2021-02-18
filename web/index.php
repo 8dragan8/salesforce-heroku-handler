@@ -48,4 +48,4 @@ if ($xml) {
     ];
 }
 
-echo $response;
+echo json_encode($response);
